@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SortVis — Sorting Algorithms Visualizer</title>
+  <meta name="description" content="Interactive sorting algorithms visualizer featuring Bubble, Selection, Insertion, Merge, Quick, and Heap Sort with step-by-step explanations and real-time animations." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Background grid overlay -->
+  <div class="bg-grid"></div>
+
+  <!-- Header -->
+  <header id="app-header">
+    <div class="header-left">
+      <h1 class="logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">Sort<span class="accent">Vis</span></span>
+      </h1>
+      <span class="tagline">Sorting Algorithms Visualizer</span>
+    </div>
+    <div class="header-right">
+      <div class="live-stats" id="live-stats">
+        <div class="stat-chip" id="stat-comparisons">
+          <span class="stat-icon">⇌</span>
+          <span class="stat-label">Comparisons</span>
+          <span class="stat-value" id="comparisons-count">0</span>
+        </div>
+        <div class="stat-chip" id="stat-swaps">
+          <span class="stat-icon">⇅</span>
+          <span class="stat-label">Swaps</span>
+          <span class="stat-value" id="swaps-count">0</span>
+        </div>
+        <div class="stat-chip" id="stat-accesses">
+          <span class="stat-icon">⟐</span>
+          <span class="stat-label">Accesses</span>
+          <span class="stat-value" id="accesses-count">0</span>
+        </div>
+      </div>
+      <div class="step-counter-container" id="step-counter-container">
+        <span class="step-label">Step</span>
+        <span class="step-numbers" id="step-counter">0 / 0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main id="app-main">
+    <!-- Left Sidebar: Controls + Algorithm Info -->
+    <aside id="sidebar" class="glass-panel">
+      <!-- Algorithm Selector -->
+      <section class="control-section">
+        <label class="control-label" for="algorithm-select">Algorithm</label>
+        <div class="select-wrapper">
+          <select id="algorithm-select">
+            <option value="bubble">Bubble Sort</option>
+            <option value="selection">Selection Sort</option>
+            <option value="insertion">Insertion Sort</option>
+            <option value="merge">Merge Sort</option>
+            <option value="quick">Quick Sort</option>
+            <option value="heap">Heap Sort</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </section>
+
+      <!-- Array Size -->
+      <section class="control-section">
+        <label class="control-label" for="size-slider">
+          Array Size: <span id="size-value" class="slider-value">30</span>
+        </label>
+        <input type="range" id="size-slider" min="5" max="100" value="30" />
+      </section>
+
+      <!-- Speed -->
+      <section class="control-section">
+        <label class="control-label" for="speed-slider">
+          Speed: <span id="speed-value" class="slider-value">Medium</span>
+        </label>
+        <input type="range" id="speed-slider" min="1" max="5" value="3" />
+      </section>
+
+      <!-- Custom Input -->
+      <section class="control-section custom-input-section">
+        <label class="control-label" for="custom-input">Custom Array</label>
+        <div class="custom-input-wrapper">
+          <input
+            type="text"
+            id="custom-input"
+            class="custom-input"
+            placeholder="e.g. 38, 27, 43, 3, 9, 82, 10"
+            spellcheck="false"
+            autocomplete="off"
+          />
+          <button id="btn-apply-input" class="btn btn-accent" title="Apply Custom Array">
+            <span class="btn-icon">✓</span>
+          </button>
+        </div>
+        <span class="input-hint" id="input-hint">Comma-separated numbers (1–99)</span>
+      </section>
+
+      <!-- Action Buttons -->
+      <section class="control-section button-group">
+        <button id="btn-generate" class="btn btn-secondary" title="Generate New Array">
+          <span class="btn-icon">⟳</span> New Array
+        </button>
+        <div class="playback-controls">
+          <button id="btn-play" class="btn btn-primary" title="Play">
+            <span class="btn-icon" id="play-icon">▶</span>
+          </button>
+          <button id="btn-pause" class="btn btn-warning" title="Pause" disabled>
+            <span class="btn-icon">⏸</span>
+          </button>
+          <button id="btn-step" class="btn btn-secondary" title="Step Forward">
+            <span class="btn-icon">⏭</span>
+          </button>
+          <button id="btn-reset" class="btn btn-ghost" title="Reset">
+            <span class="btn-icon">⏹</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="divider"></div>
+
+      <!-- Algorithm Info Card -->
+      <section class="control-section algo-info-card" id="algo-info-card">
+        <h3 class="algo-info-title" id="algo-info-title">Bubble Sort</h3>
+        <p class="algo-info-desc" id="algo-info-desc">Repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.</p>
+        <div class="complexity-grid">
+          <div class="complexity-item">
+            <span class="complexity-label">Best</span>
+            <span class="complexity-value" id="complexity-best">O(n)</span>
+          </div>
+          <div class="complexity-item">
+            <span class="complexity-label">Average</span>
+            <span class="complexity-value" id="complexity-avg">O(n²)</span>
+          </div>
+          <div class="complexity-item">
+            <span class="complexity-label">Worst</span>
+            <span class="complexity-value" id="complexity-worst">O(n²)</span>
+          </div>
+          <div class="complexity-item">
+            <span class="complexity-label">Space</span>
+            <span class="complexity-value" id="complexity-space">O(1)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Legend -->
+      <section class="control-section legend">
+        <h4 class="legend-title">Legend</h4>
+        <div class="legend-items">
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-default)"></span>
+            <span>Unsorted</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-compare)"></span>
+            <span>Comparing</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-swap)"></span>
+            <span>Swapping</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-color" style="background: var(--color-sorted)"></span>
+            <span>Sorted</span>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Center: Visualization Area -->
+    <div id="visualizer-area">
+      <div class="visualizer-container glass-panel" id="visualizer-container">
+        <div class="bars-wrapper" id="bars-wrapper">
+          <!-- Bars rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Performance Results Overlay -->
+      <div class="perf-overlay" id="perf-overlay" style="display: none;">
+        <div class="perf-card glass-panel">
+          <div class="perf-header">
+            <h3 class="perf-title">📊 Performance Results</h3>
+            <button class="btn-icon-only" id="btn-close-perf" title="Close">✕</button>
+          </div>
+          <div class="perf-time" id="perf-time">
+            <span class="perf-time-label">Time Elapsed</span>
+            <span class="perf-time-value" id="perf-time-value">0 ms</span>
+          </div>
+          <div class="perf-stats-row">
+            <div class="perf-stat">
+              <span class="perf-stat-value" id="perf-comparisons">0</span>
+              <span class="perf-stat-label">Comparisons</span>
+            </div>
+            <div class="perf-stat">
+              <span class="perf-stat-value" id="perf-swaps">0</span>
+              <span class="perf-stat-label">Swaps</span>
+            </div>
+            <div class="perf-stat">
+              <span class="perf-stat-value" id="perf-accesses">0</span>
+              <span class="perf-stat-label">Accesses</span>
+            </div>
+          </div>
+          <div class="perf-chart" id="perf-chart">
+            <div class="perf-chart-title">Comparisons vs Swaps</div>
+            <div class="perf-chart-bars">
+              <div class="perf-bar-group">
+                <div class="perf-bar-track">
+                  <div class="perf-bar perf-bar-cmp" id="perf-bar-cmp"></div>
+                </div>
+                <span class="perf-bar-label">Comparisons</span>
+                <span class="perf-bar-value" id="perf-bar-cmp-val">0</span>
+              </div>
+              <div class="perf-bar-group">
+                <div class="perf-bar-track">
+                  <div class="perf-bar perf-bar-swp" id="perf-bar-swp"></div>
+                </div>
+                <span class="perf-bar-label">Swaps</span>
+                <span class="perf-bar-value" id="perf-bar-swp-val">0</span>
+              </div>
+              <div class="perf-bar-group">
+                <div class="perf-bar-track">
+                  <div class="perf-bar perf-bar-acc" id="perf-bar-acc"></div>
+                </div>
+                <span class="perf-bar-label">Accesses</span>
+                <span class="perf-bar-value" id="perf-bar-acc-val">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Log Panel -->
+      <div class="step-log-panel glass-panel" id="step-log-panel">
+        <div class="step-log-header">
+          <h3 class="step-log-title">
+            <span class="terminal-prompt">❯</span> Execution Log
+          </h3>
+          <button class="btn-icon-only" id="btn-clear-log" title="Clear Log">✕</button>
+        </div>
+        <div class="step-log-content" id="step-log-content">
+          <div class="log-entry log-info">
+            <span class="log-prefix">[info]</span> Select an algorithm and press Play to begin visualization.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="algorithms.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
